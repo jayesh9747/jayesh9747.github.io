@@ -7,6 +7,7 @@ import { Cursor } from "./Cursor";
 import { BootSequence } from "./BootSequence";
 import { TopBar } from "./TopBar";
 import { NavDock } from "./NavDock";
+import { CommandPalette } from "./CommandPalette";
 
 /** The global operating-system shell that wraps every page. */
 export function OSChrome({ children }: { children: ReactNode }) {
@@ -18,6 +19,7 @@ export function OSChrome({ children }: { children: ReactNode }) {
       <TopBar />
       <main className="noise relative">{children}</main>
       <NavDock />
+      <CommandPalette />
     </SmoothScroll>
   );
 }

@@ -2,46 +2,44 @@
 
 # JAYESH.OS
 
-**An operating-system–style portfolio for an AI Product Engineer.**
-
-Not a website — an experience. A cinematic boot sequence, glass panels with
-dynamic lighting, a 3D skills galaxy, mission-style case studies, an interactive
-architecture playground, a grounded AI assistant, and a real developer terminal.
+**A freelance portfolio built around two things a client actually wants:
+proof the work happened, and honesty about what it cost.**
 
 [**Live → jayesh9747.github.io**](https://jayesh9747.github.io)
 
-`Next.js` · `React 19` · `TypeScript` · `Tailwind v4` · `Framer Motion` · `React Three Fiber` · `Lenis`
+`Next.js` · `React 19` · `TypeScript` · `Tailwind v4` · `Framer Motion` · `Lenis`
 
 </div>
 
 ---
 
-## Highlights
+## What's here
 
-- **Cinematic boot** — an OS-style startup sequence that resolves into the interface.
-- **Interactive career timeline** — scrub the journey; metrics count up on reveal.
-- **Skills galaxy** — a 3D constellation (React Three Fiber); click a skill and the
-  projects that use it light up. Accessible tag-cloud fallback on touch devices.
-- **Project command center** — real case studies (GitFlip, QwikAid, Transpectra, Rizzl, Eduteck) with architecture, decisions, challenges and outcomes.
-- **Architecture playground** — an interactive system diagram that traces request
-  flow and explains scaling decisions on hover.
-- **AI assistant** — a retrieval assistant grounded in the portfolio's own data.
-- **Developer terminal** — a real command interface (`help`, `projects`,
-  `open <id>`, `skills`, `resume`, `contact`).
-- **Built for performance & SEO** — static export, lazy-loaded 3D, motion that
-  respects `prefers-reduced-motion`, full metadata + JSON-LD.
+- **Case studies at their own URLs** — `/work/rizzl`, `/work/eduteck`. Each one runs
+  problem → constraints → what I built → real architecture diagram → decisions →
+  what each decision cost → hard problems → outcomes. Shareable as a single link.
+- **Outcomes are tagged `measured` / `estimated` / `observed`.** A portfolio that
+  admits which numbers are soft is more believable than one that doesn't.
+- **Lab & open source** — GitFlip, QwikAid, the CNCF Kmesh dashboard, Transpectra.
+  Deliberately lighter than the case studies so paid work reads differently from
+  side projects.
+- **⌘K palette** — jump to any section, open a case study, copy the email, or ask
+  a question answered from the site's own data. No API key; runs client side.
+- **Static export + SEO** — per-page metadata and canonicals, JSON-LD, sitemap
+  covering every case study, OG image, `prefers-reduced-motion` respected.
 
-## Tech stack
+## Adding a case study
 
-| Layer | Choice |
-|------|--------|
-| Framework | Next.js (App Router) + React 19 |
-| Language | TypeScript |
-| Styling | Tailwind CSS v4 (design tokens via `@theme`) |
-| Motion | Framer Motion |
-| 3D | React Three Fiber + drei + Three.js |
-| Smooth scroll | Lenis |
-| Hosting | GitHub Pages (static export) via GitHub Actions |
+1. Run [`docs/CASE_STUDY_PROMPT.md`](docs/CASE_STUDY_PROMPT.md) with Claude Code
+   **inside that project's own repo** — it reads the real code rather than guessing.
+2. Save the object it returns to `src/lib/case-studies/<slug>.ts` and register it
+   in [`src/lib/case-studies/index.ts`](src/lib/case-studies/index.ts).
+3. Drop a screenshot (~1600×1000) in `public/`.
+4. Fill in the `NEEDS INPUT` comments — real user counts, client quotes, the
+   actual reason behind a decision. No tool can write those.
+
+Set `locked: true` on a study that isn't ready: it renders a teaser card on the
+homepage and gets no route, so nothing half-written can ship.
 
 ## Getting started
 
@@ -51,34 +49,39 @@ npm run dev      # http://localhost:3000
 npm run build    # static export → ./out
 ```
 
-> The boot animation plays once per browser session. To replay it, run
-> `sessionStorage.clear()` in the console and refresh.
+> The boot animation plays once per session, on the homepage only — a case-study
+> link opens straight into the case study. To replay it: `sessionStorage.clear()`.
 
 ## Project structure
 
 ```
 src/
-├─ app/            layout, page composition, global styles, SEO routes
+├─ app/
+│  ├─ page.tsx           homepage composition
+│  ├─ work/[slug]/       statically generated case-study pages
+│  └─ sitemap.ts         includes every published case study
 ├─ components/
-│  ├─ os/          the OS shell — boot, cursor, ambient bg, dock, smooth scroll
-│  ├─ sections/    hero, timeline, skills galaxy, projects, architecture,
-│  │               assistant, terminal, contact
-│  └─ ui/          design-system primitives (Reveal, GlassPanel, MagneticButton…)
+│  ├─ os/                shell — boot, cursor, dock, ⌘K palette, smooth scroll
+│  ├─ sections/          hero, proof, selected work, lab, experience, closing
+│  ├─ work/              case-study view + per-project architecture diagram
+│  └─ ui/                primitives (Reveal, GlassPanel, MagneticButton…)
 └─ lib/
-   ├─ data.ts      ← single source of truth: profile, timeline, skills, projects
-   ├─ knowledge.ts retrieval engine powering the AI assistant
-   ├─ hooks.ts     media-query / reduced-motion / mounted helpers
-   └─ utils.ts     cn(), lerp, clamp, mapRange
+   ├─ data.ts            profile, experience, lab projects, stack, testimonials
+   ├─ case-studies/      one file per client engagement + the CaseStudy type
+   ├─ knowledge.ts       retrieval powering ⌘K ask-mode (built from the data)
+   ├─ hooks.ts           media-query / reduced-motion helpers
+   └─ utils.ts           cn(), lerp, clamp, mapRange
 ```
 
-**Everything content-related lives in [`src/lib/data.ts`](src/lib/data.ts).**
-Edit that one file and the entire site updates.
+Facts about Jayesh live in `data.ts`; facts about a client engagement live in
+`case-studies/`. Nothing is written twice — `knowledge.ts` builds its answers
+from both rather than restating them.
 
 ## Deployment
 
-Pushing to `main` triggers a GitHub Actions workflow that builds the static
-export and publishes it to GitHub Pages. Configured for a root user-site
-(no `basePath`); see [`next.config.ts`](next.config.ts) for project-page setup.
+Pushing to `main` builds the static export and publishes to GitHub Pages via
+GitHub Actions. Configured for a root user-site (no `basePath`); see
+[`next.config.ts`](next.config.ts) for project-page setup.
 
 ---
 

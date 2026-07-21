@@ -1,118 +1,146 @@
-import { profile, projects, skills, timeline } from "./data";
+import { experience, labProjects, profile, services, stackBands } from "./data";
+import { caseStudies } from "./case-studies";
 
 /* ============================================================
-   Local "AI" assistant — a lightweight retrieval engine over
-   the portfolio data. No API key required; runs fully client
-   side.
+   Local retrieval over the portfolio's own data. No API key,
+   runs entirely client side. Powers "ask" mode in the ⌘K palette.
+
+   Every answer is BUILT from the data files — there is no prose
+   duplicated here. That was the old bug: the services list existed
+   verbatim in both the terminal and this file and had already
+   started to drift.
    ============================================================ */
 
-export type Source = { label: string; anchor: string };
+export type Source = { label: string; href: string };
 
-export type Answer = {
-  text: string;
-  sources: Source[];
-};
+export type Answer = { text: string; sources: Source[] };
 
 type Doc = {
   id: string;
   keywords: string[];
-  anchor: string;
   label: string;
+  href: string;
   build: () => string;
 };
-
-const yearsLine = `${profile.name} has ${profile.yearsExperience}+ years of professional experience and has shipped multiple products across AI, SaaS, and cloud-native architectures.`;
 
 const docs: Doc[] = [
   {
     id: "intro",
     label: "About",
-    anchor: "hero",
-    keywords: ["who", "you", "jayesh", "about", "intro", "yourself", "role", "do"],
+    href: "#hero",
+    keywords: ["who", "about", "intro", "yourself", "jayesh", "bio"],
     build: () =>
-      `${profile.name} is a ${profile.role} — ${profile.tagline} ${yearsLine} Currently: ${profile.availability}.`,
-  },
-  {
-    id: "experience",
-    label: "Timeline",
-    anchor: "timeline",
-    keywords: ["experience", "years", "career", "journey", "history", "background", "long", "started", "worked", "intern"],
-    build: () =>
-      `${yearsLine} The journey: ${timeline
-        .map((t) => `${t.range} as ${t.title} (${t.org})`)
-        .join("; ")}.`,
-  },
-  {
-    id: "skills",
-    label: "Skills",
-    anchor: "skills",
-    keywords: ["skill", "skills", "tech", "stack", "tools", "languages", "know", "technologies", "kubernetes", "go", "python"],
-    build: () => {
-      const byGroup: Record<string, string[]> = {};
-      for (const s of skills) (byGroup[s.group] ??= []).push(s.label);
-      return `Core stack — ${Object.entries(byGroup)
-        .map(([g, list]) => `${g}: ${list.join(", ")}`)
-        .join(" · ")}.`;
-    },
+      `${profile.name} is a ${profile.role}. ${profile.tagline} Based in ${profile.location}. ${profile.availability}.`,
   },
   {
     id: "services",
-    label: "Services",
-    anchor: "terminal",
-    keywords: ["service", "services", "offer", "offering", "do you do", "help", "build", "mvp", "startup", "startups", "provide", "expert", "expertise"],
+    label: "Working together",
+    href: "#contact",
+    keywords: ["service", "services", "offer", "hire", "help", "build", "mvp", "startup", "freelance", "contract", "rate", "engage"],
     build: () =>
-      `${profile.name} provides end-to-end MVP development and scalability solutions for startups. Services include: 1) Full-Stack Web Apps (Next.js/React, Go/Node backends); 2) Mobile Apps (React Native iOS/Android); 3) Backend & APIs (Microservices, secure REST/GraphQL, optimized databases); 4) Cloud & DevOps (AWS, Docker containerization, CI/CD); 5) AI Integration (Agentic workflows, RAG pipelines, LangGraph, MCP); 6) Open Source & Tooling.`,
+      `${profile.availability}. What he takes on: ${services
+        .map((s) => `${s.title} — ${s.detail}`)
+        .join(" ")}`,
+  },
+  {
+    id: "work",
+    label: "Selected work",
+    href: "#work",
+    keywords: ["case", "study", "studies", "client", "clients", "work", "shipped", "portfolio", "paid", "freelance"],
+    build: () =>
+      `Client case studies: ${caseStudies
+        .filter((c) => !c.locked)
+        .map((c) => `${c.name} (${c.role}, ${c.year}) — ${c.hook}`)
+        .join(" ")} Read the full write-ups under Selected Work.`,
+  },
+  {
+    id: "experience",
+    label: "Experience",
+    href: "#experience",
+    keywords: ["experience", "career", "job", "jobs", "history", "background", "worked", "intern", "years", "cncf", "kmesh"],
+    build: () =>
+      `${profile.yearsExperience}+ years. ${experience
+        .map((r) => `${r.range}: ${r.title} at ${r.org}`)
+        .join("; ")}.`,
+  },
+  {
+    id: "stack",
+    label: "Stack",
+    href: "#experience",
+    keywords: ["skill", "skills", "stack", "tech", "tools", "languages", "know", "technologies", "kubernetes", "go", "python", "react", "node"],
+    build: () =>
+      stackBands.map((b) => `${b.layer}: ${b.items.join(", ")}`).join(" · "),
   },
   {
     id: "ai",
-    label: "AI & RAG work",
-    anchor: "projects",
-    keywords: ["ai", "agent", "agents", "llm", "langchain", "mcp", "rag", "gemini", "model", "models", "openai"],
-    build: () =>
-      `On the AI side, ${profile.name} builds Agentic AI workflows and tools: on QwikAid he built an Agentic AI chatbot using LangChain for roadside booking and payments with MCP; on Transpectra he integrated Gemini AI for demand forecasting and routing optimization; and at Tarana Wireless he developed an MCP service deployed on AWS to automate Jira tracking.`,
+    label: "AI work",
+    href: "#lab",
+    keywords: ["ai", "agent", "agents", "agentic", "llm", "langchain", "mcp", "rag", "gemini", "model", "openai", "native"],
+    build: () => {
+      const ai = stackBands.find((b) => b.layer === "AI");
+      return `On the AI side: ${ai?.items.join(", ")}. In practice — a LangChain agent handling booking and dispatch in QwikAid, an MCP service at Tarana Wireless that automates Jira/Zephyr ticketing (Dockerized on EC2), and Gemini-assisted route planning in Transpectra.`;
+    },
   },
   {
-    id: "projects",
-    label: "Projects",
-    anchor: "projects",
-    keywords: ["project", "projects", "built", "build", "work", "shipped", "portfolio", "case"],
+    id: "lab",
+    label: "Lab & open source",
+    href: "#lab",
+    keywords: ["open", "source", "oss", "github", "side", "project", "projects", "lab", "gitflip", "maintainer"],
     build: () =>
-      `${profile.name} has built: ${projects
-        .map((p) => `${p.name} — ${p.tagline} (${p.stack.slice(0, 3).join(", ")})`)
-        .join("; ")}.`,
+      labProjects.map((p) => `${p.name} — ${p.blurb}`).join(" "),
   },
   {
     id: "contact",
     label: "Contact",
-    anchor: "contact",
-    keywords: ["touch", "get in touch", "contact", "email", "mail", "hire", "reach", "available", "availability", "talk", "connect", "linkedin", "phone", "number", "call", "schedule", "meet", "meeting"],
+    href: "#contact",
+    keywords: ["contact", "email", "mail", "reach", "touch", "available", "availability", "talk", "connect", "linkedin", "phone", "call", "meet", "hire"],
     build: () =>
-      `${profile.availability}. Reach out at email: ${profile.email}, phone: ${profile.phone}, LinkedIn: linkedin.com/in/jayesh-savaliya, or use the "Schedule 30-Min Meet" action in the Contact panel.`,
+      `${profile.availability}. Email ${profile.email} or call ${profile.phone}. Also on ${profile.socials
+        .map((s) => s.label)
+        .join(", ")}.`,
   },
 ];
 
-// Per-project docs so "tell me about GitFlip" works.
-for (const p of projects) {
+// Per-study docs so "tell me about Rizzl" works.
+for (const study of caseStudies) {
+  if (study.locked) continue;
   docs.push({
-    id: `project-${p.id}`,
-    label: p.name,
-    anchor: "projects",
-    keywords: [p.name.toLowerCase(), p.id, ...p.stack.map((s) => s.toLowerCase())],
+    id: `study-${study.slug}`,
+    label: study.name,
+    href: `/work/${study.slug}/`,
+    keywords: [
+      study.slug,
+      study.name.toLowerCase(),
+      ...study.stack.flatMap((s) => s.items.map((i) => i.toLowerCase())),
+    ],
     build: () =>
-      `${p.name} (${p.status.toLowerCase()}) — ${p.overview} Stack: ${p.stack.join(
-        ", ",
-      )}. Key results: ${p.results.join(" ")}`,
+      `${study.name} — ${study.hook} Role: ${study.role}, ${study.duration}. ${study.problem}`,
   });
 }
 
+/**
+ * Question words carry no signal but used to dominate scoring — "what AI work
+ * have you done" matched the About doc on "you" and never reached the AI doc.
+ */
+const STOPWORDS = new Set([
+  "what", "whats", "which", "how", "why", "when", "where", "does", "did", "do",
+  "done", "have", "has", "had", "you", "your", "yours", "youve", "me", "my",
+  "the", "a", "an", "and", "or", "of", "for", "to", "in", "on", "is", "are",
+  "was", "were", "be", "been", "with", "any", "some", "can", "could", "would",
+  "tell", "show", "give", "about",
+]);
+
 function score(query: string, doc: Doc) {
   const q = query.toLowerCase();
-  const tokens = q.split(/[^a-z0-9]+/).filter(Boolean);
+  const tokens = q
+    .split(/[^a-z0-9]+/)
+    .filter((t) => t && !STOPWORDS.has(t));
   let s = 0;
   for (const kw of doc.keywords) {
-    if (q.includes(kw)) s += kw.length > 4 ? 3 : 2;
+    // Substring credit only for keywords distinctive enough to mean something.
+    if (kw.length > 3 && q.includes(kw)) s += kw.length > 4 ? 3 : 2;
     for (const t of tokens) {
-      if (t === kw) s += 3;
+      if (t === kw) s += 4;
       else if (kw.includes(t) && t.length > 3) s += 1;
     }
   }
@@ -120,18 +148,17 @@ function score(query: string, doc: Doc) {
 }
 
 export const suggestedQuestions = [
-  "What projects has Jayesh built?",
-  "What services does he provide?",
-  "What AI systems has he worked on?",
-  "What's the tech stack?",
-  "How can I get in touch?",
+  "What have you built for clients?",
+  "What AI work have you done?",
+  "What's your stack?",
+  "Are you available for freelance?",
 ];
 
 export function answer(query: string): Answer {
   const q = query.trim();
   if (!q) {
     return {
-      text: `Ask me anything about ${profile.name} — projects, experience, the AI work, or how to get in touch.`,
+      text: `Ask about the case studies, the stack, the AI work, or availability.`,
       sources: [],
     };
   }
@@ -143,13 +170,14 @@ export function answer(query: string): Answer {
   const top = ranked[0];
   if (!top || top.s === 0) {
     return {
-      text: `I'm tuned to ${profile.name}'s portfolio. Try asking about projects, skills, AI experience, or contact. For example: "${suggestedQuestions[0]}"`,
+      text: `I only know this portfolio. Try: "${suggestedQuestions[0]}"`,
       sources: [],
     };
   }
 
   const picks = ranked.filter((r) => r.s >= Math.max(2, top.s * 0.6)).slice(0, 2);
-  const text = picks.map((p) => p.d.build()).join("\n\n");
-  const sources = picks.map((p) => ({ label: p.d.label, anchor: p.d.anchor }));
-  return { text, sources };
+  return {
+    text: picks.map((p) => p.d.build()).join("\n\n"),
+    sources: picks.map((p) => ({ label: p.d.label, href: p.d.href })),
+  };
 }

@@ -1,13 +1,11 @@
 import { Hero } from "@/components/sections/Hero";
-import { Timeline } from "@/components/sections/Timeline";
-import { SkillsGalaxy } from "@/components/sections/SkillsGalaxy";
-import { Projects } from "@/components/sections/Projects";
-import { Testimonials } from "@/components/sections/Testimonials";
-import { Architecture } from "@/components/sections/Architecture";
-import { Assistant } from "@/components/sections/Assistant";
-import { Terminal } from "@/components/sections/Terminal";
-import { Contact } from "@/components/sections/Contact";
-import { profile } from "@/lib/data";
+import { Proof } from "@/components/sections/Proof";
+import { SelectedWork } from "@/components/sections/SelectedWork";
+import { Lab } from "@/components/sections/Lab";
+import { Experience } from "@/components/sections/Experience";
+import { Closing } from "@/components/sections/Closing";
+import { profile, stackBands } from "@/lib/data";
+import { publishedCaseStudies } from "@/lib/case-studies";
 
 export default function Home() {
   const jsonLd = {
@@ -18,13 +16,16 @@ export default function Home() {
     description: profile.tagline,
     email: profile.email,
     url: "https://jayesh9747.github.io",
-    knowsAbout: [
-      "AI Engineering",
-      "SaaS Architecture",
-      "Next.js",
-      "React",
-      "LLM Agents",
-    ],
+    address: { "@type": "PostalAddress", addressLocality: "Pune", addressCountry: "IN" },
+    sameAs: profile.socials
+      .filter((s) => s.href.startsWith("http"))
+      .map((s) => s.href),
+    knowsAbout: stackBands.flatMap((b) => b.items),
+    subjectOf: publishedCaseStudies.map((c) => ({
+      "@type": "CreativeWork",
+      name: c.name,
+      url: `https://jayesh9747.github.io/work/${c.slug}/`,
+    })),
   };
 
   return (
@@ -34,14 +35,11 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Hero />
-      <Timeline />
-      <SkillsGalaxy />
-      <Projects />
-      <Testimonials />
-      <Architecture />
-      <Assistant />
-      <Terminal />
-      <Contact />
+      <Proof />
+      <SelectedWork />
+      <Lab />
+      <Experience />
+      <Closing />
     </>
   );
 }

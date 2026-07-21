@@ -2,13 +2,25 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { profile } from "@/lib/data";
 import { usePrefersReducedMotion } from "@/lib/hooks";
 
-const STEP_MS = 320;
+/**
+ * Kept short on purpose. A boot animation is a cost the visitor pays before
+ * seeing anything, and a prospective client who bounces during it never sees
+ * the portfolio at all. Three lines at this cadence lands around 1.2s.
+ */
+const STEP_MS = 190;
+const START_MS = 300;
+const TAIL_MS = 420;
 
 export function BootSequence() {
   const reduced = usePrefersReducedMotion();
+  const pathname = usePathname();
+  // A case-study URL is what gets sent to a client. They should land on the
+  // case study, not on a loading animation for a portfolio they didn't ask for.
+  const isHome = pathname === "/";
   const [booting, setBooting] = useState(true);
   const [step, setStep] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -17,8 +29,11 @@ export function BootSequence() {
   const total = lines.length;
 
   useEffect(() => {
-    // Only boot once per session.
-    if (typeof window !== "undefined" && sessionStorage.getItem("os-booted")) {
+    // Only boot once per session, and only on the homepage.
+    if (
+      !isHome ||
+      (typeof window !== "undefined" && sessionStorage.getItem("os-booted"))
+    ) {
       setBooting(false);
       return;
     }
@@ -31,11 +46,11 @@ export function BootSequence() {
     document.body.style.overflow = "hidden";
 
     const stepTimers = lines.map((_, i) =>
-      setTimeout(() => setStep(i + 1), 500 + i * STEP_MS),
+      setTimeout(() => setStep(i + 1), START_MS + i * STEP_MS),
     );
 
-    const progStart = 500;
-    const progDur = total * STEP_MS + 400;
+    const progStart = START_MS;
+    const progDur = total * STEP_MS + TAIL_MS;
     let raf = 0;
     let t0: number | null = null;
     const tick = (t: number) => {
@@ -52,7 +67,7 @@ export function BootSequence() {
         sessionStorage.setItem("os-booted", "1");
         document.body.style.overflow = "";
       },
-      500 + total * STEP_MS + 900,
+      START_MS + total * STEP_MS + TAIL_MS,
     );
 
     return () => {
@@ -62,7 +77,11 @@ export function BootSequence() {
       document.body.style.overflow = "";
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduced]);
+  }, [reduced, isHome]);
+
+  // Rendered out entirely rather than dismissed in an effect, so a deep link
+  // never flashes the overlay before the effect gets a chance to run.
+  if (!isHome) return null;
 
   return (
     <AnimatePresence>
