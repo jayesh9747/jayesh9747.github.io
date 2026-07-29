@@ -8,39 +8,29 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import {
-  Home,
-  GitBranch,
-  Orbit,
-  Rocket,
-  MessageSquare,
-  Network,
-  Bot,
-  TerminalSquare,
-  Mail,
-} from "lucide-react";
+import { Home, Briefcase, FlaskConical, GitBranch, Mail } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { scrollToSection } from "./SmoothScroll";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/lib/hooks";
 
 const items = [
   { id: "hero", label: "Home", Icon: Home },
-  { id: "timeline", label: "Timeline", Icon: GitBranch },
-  { id: "skills", label: "Skills", Icon: Orbit },
-  { id: "projects", label: "Missions", Icon: Rocket },
-  { id: "testimonials", label: "Feedback", Icon: MessageSquare },
-  { id: "architecture", label: "Architecture", Icon: Network },
-  { id: "assistant", label: "Assistant", Icon: Bot },
-  { id: "terminal", label: "Terminal", Icon: TerminalSquare },
+  { id: "work", label: "Work", Icon: Briefcase },
+  { id: "lab", label: "Lab", Icon: FlaskConical },
+  { id: "experience", label: "Experience", Icon: GitBranch },
   { id: "contact", label: "Contact", Icon: Mail },
 ];
 
 export function NavDock() {
   const [active, setActive] = useState("hero");
   const isMobile = useIsMobile();
+  const pathname = usePathname();
   const mouseX = useMotionValue(Infinity);
+  const onHome = pathname === "/";
 
   useEffect(() => {
+    if (!onHome) return;
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
@@ -55,7 +45,11 @@ export function NavDock() {
       if (el) observer.observe(el);
     });
     return () => observer.disconnect();
-  }, []);
+  }, [onHome]);
+
+  // The dock is a homepage-anchor nav — on a case-study page there's nothing
+  // for it to point at, and the page has its own "back" link.
+  if (!onHome) return null;
 
   return (
     <motion.nav

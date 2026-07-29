@@ -18,6 +18,19 @@ const geistMono = Geist_Mono({
 
 const siteUrl = "https://jayesh9747.github.io";
 
+/**
+ * Static file rather than a generated `opengraph-image` route: under
+ * `output: "export"` that route emits an extension-less file, which GitHub
+ * Pages serves as application/octet-stream — and every social crawler
+ * rejects a non-image content type, so the card renders blank.
+ */
+const ogImage = {
+  url: "/og.png",
+  width: 1200,
+  height: 630,
+  alt: `${profile.name} — ${profile.role}`,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
@@ -26,26 +39,32 @@ export const metadata: Metadata = {
   },
   description: profile.tagline,
   keywords: [
-    "AI Product Engineer",
-    "SaaS Architect",
-    "Next.js",
+    "Freelance Full-Stack Developer",
+    "AI Engineer",
+    "React Native Developer",
     "AI Agents",
-    "Full-Stack Engineer",
+    "MCP",
+    "Next.js",
+    "Node.js",
+    "Kubernetes",
     profile.name,
   ],
   authors: [{ name: profile.name }],
   creator: profile.name,
+  alternates: { canonical: `${siteUrl}/` },
   openGraph: {
     type: "website",
     url: siteUrl,
     title: `${profile.name} — ${profile.role}`,
     description: profile.tagline,
     siteName: profile.os,
+    images: [ogImage],
   },
   twitter: {
     card: "summary_large_image",
     title: `${profile.name} — ${profile.role}`,
     description: profile.tagline,
+    images: [ogImage.url],
   },
   robots: { index: true, follow: true },
 };

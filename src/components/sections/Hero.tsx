@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowDown, Sparkles, FileText } from "lucide-react";
+import { ArrowDown, Sparkles } from "lucide-react";
 import { profile } from "@/lib/data";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { scrollToSection } from "@/components/os/SmoothScroll";
@@ -136,7 +136,8 @@ export function Hero() {
     <section
       id="hero"
       ref={ref}
-      className="relative flex min-h-[100svh] items-center justify-center overflow-hidden pt-9"
+      // pb clears the fixed nav dock so the scroll hint doesn't sit under it
+      className="relative flex min-h-[100svh] items-center justify-center overflow-hidden pb-28 pt-9"
     >
       <Particles />
 
@@ -162,7 +163,7 @@ export function Hero() {
         >
           <span className="text-gradient">Hi, I&apos;m {profile.name}.</span>
           <br />
-          <span className="text-gradient-accent">I build AI-powered products.</span>
+          <span className="text-gradient-accent">I ship whole products.</span>
         </motion.h1>
 
         <motion.div
@@ -192,29 +193,17 @@ export function Hero() {
         >
           <MagneticButton
             variant="primary"
-            onClick={() => scrollToSection("projects")}
+            onClick={() => scrollToSection("work")}
             data-cursor-label="open"
           >
             <Sparkles className="size-4" />
-            View missions
+            Read the case studies
           </MagneticButton>
           <MagneticButton
             variant="outline"
-            onClick={() => scrollToSection("assistant")}
+            onClick={() => scrollToSection("contact")}
           >
-            Ask the AI about me
-          </MagneticButton>
-          <MagneticButton
-            variant="outline"
-            onClick={() => {
-              const link = document.createElement("a");
-              link.href = "/Jayesh_Savaliya_9747.pdf";
-              link.download = "Jayesh_Savaliya_9747.pdf";
-              link.click();
-            }}
-          >
-            <FileText className="size-4" />
-            Download Resume
+            Start a project
           </MagneticButton>
         </motion.div>
 
@@ -222,10 +211,14 @@ export function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.6, duration: 1 }}
-          className="mt-16 flex flex-col items-center gap-2 text-ink-faint"
+          className="mt-12 flex flex-col items-center gap-2 text-ink-faint"
         >
           <span className="font-mono text-[10px] uppercase tracking-[0.3em]">
-            scroll to explore
+            press{" "}
+            <kbd className="rounded border border-line bg-white/[0.04] px-1.5 py-0.5 text-ink-dim">
+              ⌘K
+            </kbd>{" "}
+            to jump anywhere
           </span>
           <motion.div
             animate={{ y: [0, 6, 0] }}

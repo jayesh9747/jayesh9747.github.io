@@ -26,10 +26,3 @@ export function useIsMobile() {
 export function usePrefersReducedMotion() {
   return useMediaQuery("(prefers-reduced-motion: reduce)");
 }
-
-/** Has the component mounted on the client yet? */
-export function useMounted() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  return mounted;
-}
